@@ -38,4 +38,48 @@ public class StatisticsTest
         assertTrue(Float.isNaN(s.min));
         assertTrue(Float.isNaN(s.max));
     }
+
+    @Test
+    public void convertsCelsiusInputToFahrenheitBeforeComputingStats()
+    {
+        List<Double> temperaturesInCelsius = Arrays.asList(37.0, 36.7778, 36.5556, 39.0);
+
+        Stats s = Statistics.getStatistics(temperaturesInCelsius, TemperatureUnit.CELSIUS);
+
+        float epsilon = 0.01f;
+        assertEquals(99.2f, s.average, epsilon);
+        assertEquals(97.8f, s.min, epsilon);
+        assertEquals(102.2f, s.max, epsilon);
+    }
+
+    @Test
+    public void acceptsIntegralTemperatureReadings()
+    {
+        List<Integer> numbers = Arrays.asList(98, 99, 100);
+
+        Stats s = Statistics.getStatistics(numbers, TemperatureUnit.FAHRENHEIT);
+
+        float epsilon = 0.001f;
+        assertEquals(99.0f, s.average, epsilon);
+        assertEquals(98.0f, s.min, epsilon);
+        assertEquals(100.0f, s.max, epsilon);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNullTemperatureReadings()
+    {
+        Statistics.getStatistics(Arrays.asList(98.6, null, 100.0), TemperatureUnit.FAHRENHEIT);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNotANumberTemperatureReadings()
+    {
+        Statistics.getStatistics(Arrays.asList(98.6, Double.NaN), TemperatureUnit.FAHRENHEIT);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsMissingTemperatureUnit()
+    {
+        Statistics.getStatistics(Arrays.asList(98.6, 99.1), null);
+    }
 }
